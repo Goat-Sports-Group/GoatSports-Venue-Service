@@ -12,7 +12,10 @@ class DemoSimulationSeederTest {
     @Test
     void everyCityOffersTheCommonSportsWithUniqueIds() {
         List<DemoSimulationSeeder.Venue> venues = DemoSimulationSeeder.venues();
-        assertThat(venues).hasSize(36);
+        assertThat(venues).hasSize(72);
+        // Đợt đầu (36 cơ sở) giữ nguyên chủ cũ; đợt mở rộng thuộc 8 chủ sân mới.
+        assertThat(venues.subList(0, 36)).allMatch(venue -> venue.owner().index() < DemoPopulation.FIRST_OWNERS);
+        assertThat(venues.subList(36, 72)).allMatch(venue -> venue.owner().index() >= DemoPopulation.FIRST_OWNERS);
         assertThat(venues.stream().map(DemoSimulationSeeder.Venue::id).distinct()).hasSize(venues.size());
         // Id phải giống nhau giữa các lần chạy JVM (thứ tự lặp của Map.of thì không), nếu không mỗi lần khởi động
         // lại sinh thêm một bộ cơ sở mới.
@@ -40,5 +43,31 @@ class DemoSimulationSeederTest {
         double weekend = DemoSimulationSeeder.dailyProbability(player, monday.plusDays(5), first, today);
         assertThat(early).isLessThan(late);
         assertThat(weekend).isGreaterThan(late).isLessThanOrEqualTo(0.9);
+    }
+
+    @Test
+    void tournamentsUseCourtsOfTheDemoVenues() {
+        assertThat(DemoTournaments.ALL).allSatisfy(tournament -> {
+            DemoDataSeeder.VenueSeed venue = DemoDataSeeder.VENUES.stream()
+                    .filter(seed -> seed.name().equals(tournament.venue().name())).findFirst().orElseThrow();
+            assertThat(venue.ownerEmail()).isEqualTo(tournament.venue().ownerEmail());
+            assertThat(venue.city()).isEqualTo(tournament.venue().city());
+            assertThat(venue.courts()).extracting(DemoDataSeeder.CourtSeed::name).containsAll(tournament.courts());
+            assertThat(venue.courts()).filteredOn(court -> tournament.courts().contains(court.name()))
+                    .allMatch(court -> court.sportType().name().equals(tournament.sport()));
+        });
+    }
+
+    @Test
+    void futureDaysFillUpAsTheyGetCloser() {
+        LocalDate today = LocalDate.of(2026, 11, 12);
+        assertThat(DemoSimulationSeeder.advance(today.minusDays(3), today)).isEqualTo(1);
+        assertThat(DemoSimulationSeeder.advance(today.plusDays(2), today))
+                .isGreaterThan(DemoSimulationSeeder.advance(today.plusDays(10), today));
+        assertThat(DemoSimulationSeeder.advance(DemoPopulation.COVER_UNTIL, today)).isEqualTo(0.12);
+        // Sau hôm nay không còn tăng trưởng thêm.
+        LocalDate first = today.minusDays(DemoPopulation.HISTORY_DAYS);
+        assertThat(DemoSimulationSeeder.growth(today.plusDays(30), first, today)).isEqualTo(1);
+        assertThat(DemoSimulationSeeder.growth(first, first, today)).isEqualTo(0.55);
     }
 }

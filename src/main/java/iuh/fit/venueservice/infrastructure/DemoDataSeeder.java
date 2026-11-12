@@ -45,17 +45,17 @@ public class DemoDataSeeder implements CommandLineRunner {
         return UUID.nameUUIDFromBytes(("goatsports:" + kind + ":" + key).getBytes(StandardCharsets.UTF_8));
     }
 
-    private record CourtSeed(String name, SportType sportType, int capacity,
+    record CourtSeed(String name, SportType sportType, int capacity,
                              String surface, double pricePerHour) {}
 
-    private record VenueSeed(
+    record VenueSeed(
             String name, String ownerEmail, String description,
             String street, String ward, String district, String city,
             double latitude, double longitude,
             LocalTime openTime, LocalTime closeTime,
             String phone, String email, List<CourtSeed> courts) {}
 
-    private static final List<VenueSeed> VENUES = List.of(
+    static final List<VenueSeed> VENUES = List.of(
             new VenueSeed("Sân Thể Thao Bình Thạnh", "bao.tranquoc@goatsports.vn",
                     "Cụm sân cỏ nhân tạo 5 và 7 người, có đèn chiếu sáng và phòng thay đồ.",
                     "121 Đinh Bộ Lĩnh", "Phường 26", "Bình Thạnh", "Hồ Chí Minh",

@@ -16,15 +16,20 @@ import java.util.UUID;
  * chỉ số (java.util.Random có thuật toán cố định), nên mọi service tự tính ra cùng một danh sách và cùng id
  * ({@code UUID.nameUUIDFromBytes("goatsports:user:" + email)}) mà không cần gọi nhau.
  *
- * <p><b>Bản sao giống hệt</b> ở auth-service, venue-service và social-service (mỗi service là một project Maven riêng).
- * Sửa một bản thì sửa cả ba; {@code DemoPopulationTest} ở mỗi service chốt vài giá trị để bản lệch bị phát hiện.
+ * <p><b>Bản sao giống hệt</b> ở auth-service, venue-service, social-service và club-service (mỗi service là một project
+ * Maven riêng); ai-service có bản Python ({@code app/infrastructure/demo/population.py}). Sửa một bản thì sửa cả năm;
+ * {@code DemoPopulationTest} ở mỗi service chốt vài giá trị để bản lệch bị phát hiện.
  */
 final class DemoPopulation {
-    static final int PLAYERS = 120;
-    static final int OWNERS = 8;
+    static final int PLAYERS = 300;
+    static final int OWNERS = 16;
+    /** Bản đầu có 120 người chơi, 8 chủ sân; sinh theo chỉ số nên tăng số lượng không đổi những người đã có. */
+    static final int FIRST_OWNERS = 8;
     static final String DOMAIN = "demo.goatsports.vn";
     /** Lịch sử hoạt động mô phỏng (đặt sân, bài viết) trải từ bấy nhiêu ngày trước tới hôm nay. */
     static final int HISTORY_DAYS = 120;
+    /** Dữ liệu tương lai (khung giờ, lượt đặt trước, giải đấu, sinh hoạt CLB) kéo tới hết ngày này. */
+    static final LocalDate COVER_UNTIL = LocalDate.of(2026, 12, 31);
 
     record City(String name, double latitude, double longitude, List<String> districts, int weight) { }
 
@@ -131,7 +136,10 @@ final class DemoPopulation {
     static List<Owner> owners() {
         String[][] names = {{"Trương Văn Hậu", "Hồ Chí Minh"}, {"Lâm Thị Kim Oanh", "Hồ Chí Minh"},
                 {"Mai Quốc Việt", "Hồ Chí Minh"}, {"Đoàn Minh Tâm", "Hà Nội"}, {"Kiều Thị Hồng Nhung", "Hà Nội"},
-                {"Tạ Đức Thịnh", "Đà Nẵng"}, {"Châu Ngọc Lan", "Khánh Hòa"}, {"Quách Văn Lực", "Khánh Hòa"}};
+                {"Tạ Đức Thịnh", "Đà Nẵng"}, {"Châu Ngọc Lan", "Khánh Hòa"}, {"Quách Văn Lực", "Khánh Hòa"},
+                {"Phùng Minh Khôi", "Hồ Chí Minh"}, {"Lưu Thị Bích Ngọc", "Hồ Chí Minh"}, {"Vương Đình Trọng", "Hồ Chí Minh"},
+                {"Giang Văn Phú", "Hà Nội"}, {"Ông Thị Thanh Hằng", "Hà Nội"}, {"Thái Quốc Bảo", "Đà Nẵng"},
+                {"Mạc Thị Diễm", "Đà Nẵng"}, {"Lạc Văn Toàn", "Khánh Hòa"}};
         List<Owner> owners = new ArrayList<>(OWNERS);
         for (int index = 0; index < OWNERS; index++) {
             String name = names[index][0];
