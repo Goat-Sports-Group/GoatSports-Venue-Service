@@ -601,9 +601,29 @@ public class DemoSimulationSeeder implements CommandLineRunner {
     private static Object[] review(Random random, UUID bookingId, UUID playerId, Venue venue, String sport, LocalDate date) {
         int rating = (int) Math.max(1, Math.min(5, Math.round(venue.quality() + random.nextGaussian() * 0.7)));
         Timestamp reviewedAt = Timestamp.valueOf(date.plusDays(1).atTime(19 + random.nextInt(3), 0));
-        return new Object[]{id("sim-review", bookingId.toString()), playerId, rating, reviewText(random, rating, sport),
-                venue.id(), bookingId, reviewedAt, CREATED_BY, reviewedAt, CREATED_BY};
+        String text = reviewText(random, rating, sport);
+        String abusive = abusiveText(bookingId);
+        return new Object[]{id("sim-review", bookingId.toString()), playerId, abusive == null ? rating : 1,
+                abusive == null ? text : abusive, venue.id(), bookingId, reviewedAt, CREATED_BY, reviewedAt, CREATED_BY};
     }
+
+    /**
+     * ~3% đánh giá vi phạm thật (lừa đảo, spam, xúc phạm, đe dọa) để bộ lọc "AI nghi vi phạm" của admin có việc.
+     * Chọn theo mã đơn, không rút từ {@code random}: rút thêm sẽ làm lệch các lượt đặt sinh sau đó.
+     */
+    static String abusiveText(UUID bookingId) {
+        if (Math.floorMod(bookingId.getLeastSignificantBits() >>> 20, 100) >= 3) return null;
+        return ABUSIVE[Math.floorMod(bookingId.getMostSignificantBits() >>> 20, ABUSIVE.length)];
+    }
+
+    private static final String[] ABUSIVE = {
+            "Nhận đặt sân giá rẻ hơn 50%, chuyển khoản trước 200k cọc qua số 0987xxxxxx rồi nhắn Zalo để giữ chỗ.",
+            "Bấm link bit.ly/san-free-2026 nhận voucher 500k đặt sân miễn phí, chỉ cần nhập mật khẩu tài khoản.",
+            "Bán acc game giá rẻ, cày thuê, inbox ngay!!! Bán acc game giá rẻ, cày thuê, inbox ngay!!!",
+            "Thằng chủ sân mất dạy, mặt như cái l**, loại người như mày nên cút khỏi nghề đi.",
+            "Nhân viên ở đây ngu như bò, đầu óc toàn bã đậu, tao gặp lại là tao tát vỡ mồm.",
+            "Lần sau còn xếp sân kiểu này thì tao dẫn anh em tới đập nát cái sân, đốt luôn quầy nước.",
+            "Dân tỉnh đó toàn bọn lừa đảo, đừng có cho tụi nó vào sân chơi chung."};
 
     // ---- Mô hình nhu cầu ----
 

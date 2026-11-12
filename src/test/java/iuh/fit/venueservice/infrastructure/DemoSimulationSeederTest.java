@@ -2,8 +2,11 @@ package iuh.fit.venueservice.infrastructure;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,5 +72,14 @@ class DemoSimulationSeederTest {
         LocalDate first = today.minusDays(DemoPopulation.HISTORY_DAYS);
         assertThat(DemoSimulationSeeder.growth(today.plusDays(30), first, today)).isEqualTo(1);
         assertThat(DemoSimulationSeeder.growth(first, first, today)).isEqualTo(0.55);
+    }
+
+    @Test
+    void aSmallShareOfReviewsIsAbusiveForTheAiFilter() {
+        long abusive = IntStream.range(0, 10_000)
+                .mapToObj(i -> UUID.nameUUIDFromBytes(("goatsports:sim-booking:" + i).getBytes(StandardCharsets.UTF_8)))
+                .filter(bookingId -> DemoSimulationSeeder.abusiveText(bookingId) != null)
+                .count();
+        assertThat(abusive).isBetween(200L, 400L);
     }
 }
