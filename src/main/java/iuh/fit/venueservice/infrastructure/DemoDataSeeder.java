@@ -568,7 +568,7 @@ public class DemoDataSeeder implements CommandLineRunner {
                                 select :slotId, :date, :startTime, :endTime,
                                        :price, 'AVAILABLE', :courtId,
                                        now(), 'demo-seed', now(), 'demo-seed'
-                                where not exists (select 1 from time_slots where time_slot_id = :slotId)
+                                on conflict do nothing
                                 """)
                         .setParameter("slotId", id("slot", courtId + "|" + date + "|" + start))
                         .setParameter("date", date)
