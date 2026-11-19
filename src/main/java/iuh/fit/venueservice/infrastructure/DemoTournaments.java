@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Lịch giải đấu mô phỏng (tháng 7 – hết tháng 12/2026) trên các cơ sở của chủ sân demo. Ngày tuyệt đối, nên chạy lại
+ * Lịch giải đấu mô phỏng (tháng 7/2026 – tháng 1/2027; giải tháng 1 chỉ mở đăng ký trong khoảng mô phỏng) trên các cơ sở của chủ sân demo. Ngày tuyệt đối, nên chạy lại
  * lúc nào cũng ra cùng lịch: club-service dựng giải, đội, trận và tỷ số; venue-service giữ sân (court_holds) đúng các
  * khung giờ đó để không chào bán trùng.
  *
@@ -102,6 +102,11 @@ final class DemoTournaments {
         return LocalDate.of(2026, month, dayOfMonth);
     }
 
+    /** Giải năm 2027: bắt đầu sau khoảng mô phỏng nhưng mở đăng ký (trước 30 ngày) trong tháng 12/2026. */
+    private static LocalDate newYear(int month, int dayOfMonth) {
+        return LocalDate.of(2027, month, dayOfMonth);
+    }
+
     static final List<Tournament> ALL = List.of(
             new Tournament("Cúp Bóng Đá 7 Người Bình Thạnh Hè 2026", "FOOTBALL", "FOOTBALL_7", KO, BINH_THANH, SEVEN,
                     day(7, 26), 7, 8, H7, H11, 60, 1_200_000, 10_000_000,
@@ -150,7 +155,32 @@ final class DemoTournaments {
                     "Vòng tròn 6 đội sân 7 đón năm mới, đang mở đăng ký."),
             new Tournament("Giải Tennis Đôi Mỹ Đình Giáng Sinh", "TENNIS", "TENNIS_DOUBLES", KO, MY_DINH, TENNIS,
                     day(12, 19), 1, 8, H6, H11, 90, 500_000, 8_000_000,
-                    "8 cặp đôi tennis tranh cúp Giáng Sinh, đang mở đăng ký.")
+                    "8 cặp đôi tennis tranh cúp Giáng Sinh, đang mở đăng ký."),
+            // Đợt bổ sung cho demo cuối năm: môn nào cũng có giải đang mở đăng ký tới hết tháng 12.
+            new Tournament("Giải Bóng Chuyền Phong Trào Tân Bình Tháng 12", "VOLLEYBALL", "VOLLEYBALL_6", RR, TAN_BINH,
+                    VOLLEY, day(12, 12), 2, 6, H7, H10, 60, 500_000, 4_000_000,
+                    "Vòng tròn 6 đội bóng chuyền, đấu 3 set thắng 2, mỗi trận một buổi sáng."),
+            new Tournament("Giải Pickleball Đôi Sơn Trà Cuối Năm", "PICKLEBALL", "PICKLEBALL_DOUBLES", KO, SON_TRA, PICKLE,
+                    day(12, 20), 1, 8, H7, H11, 30, 300_000, 4_000_000,
+                    "8 cặp đôi pickleball loại trực tiếp trong 3 buổi sáng cuối năm, đánh tới 11 điểm."),
+            new Tournament("Cúp Futsal Tết Dương Lịch 2027", "FOOTBALL", "FOOTBALL_5", KO, BINH_THANH, FIVE,
+                    newYear(1, 10), 7, 8, H7, H11, 50, 700_000, 7_000_000,
+                    "8 đội futsal loại trực tiếp qua 3 Chủ nhật đầu năm, đang mở đăng ký."),
+            new Tournament("Giải Cầu Lông Đơn Đầu Năm 2027", "BADMINTON", "BADMINTON_SINGLES", KO, PHU_NHUAN, SHUTTLE,
+                    newYear(1, 9), 1, 8, H13, H17, 40, 150_000, 2_500_000,
+                    "8 tay vợt đơn loại trực tiếp trong 3 buổi chiều, đang mở đăng ký."),
+            new Tournament("Giải Pickleball Đôi Đầu Xuân 2027", "PICKLEBALL", "PICKLEBALL_DOUBLES", RR, SON_TRA, PICKLE,
+                    newYear(1, 16), 1, 6, H7, H11, 30, 250_000, 3_000_000,
+                    "Vòng tròn 6 cặp đôi pickleball, đang mở đăng ký."),
+            new Tournament("Giải Bóng Chuyền Mừng Xuân 2027", "VOLLEYBALL", "VOLLEYBALL_6", KO, TAN_BINH, VOLLEY,
+                    newYear(1, 17), 1, 8, H7, H11, 60, 500_000, 5_000_000,
+                    "8 đội bóng chuyền loại trực tiếp, đấu 3 set thắng 2, đang mở đăng ký."),
+            new Tournament("Giải Bóng Rổ 3x3 Đón Tết 2027", "BASKETBALL", "BASKETBALL_3X3", KO, TAN_BINH, HOOPS,
+                    newYear(1, 23), 1, 8, H7, H11, 40, 400_000, 3_500_000,
+                    "Bóng rổ 3x3 đón Tết, 8 đội, đang mở đăng ký."),
+            new Tournament("Giải Tennis Đơn Mỹ Đình Đầu Năm 2027", "TENNIS", "TENNIS_SINGLES", RR, MY_DINH, TENNIS,
+                    newYear(1, 24), 1, 6, H6, H11, 90, 350_000, 6_000_000,
+                    "Vòng tròn 6 tay vợt đơn, 3 set thắng 2, đang mở đăng ký.")
     );
 
     private DemoTournaments() { }

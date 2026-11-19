@@ -15,14 +15,19 @@ class DemoTournamentsTest {
 
     @Test
     void scheduleIsStableAndFitsTheDailyWindow() {
-        assertThat(DemoTournaments.ALL).hasSize(16);
+        assertThat(DemoTournaments.ALL).hasSize(24);
         assertThat(DemoTournaments.ALL.get(0).id()).isEqualTo(UUID.fromString("d6d49277-3762-327d-bd6c-889f44bbcde9"));
-        assertThat(DemoTournaments.ALL.stream().map(DemoTournaments.Tournament::name).distinct()).hasSize(16);
+        assertThat(DemoTournaments.ALL.stream().map(DemoTournaments.Tournament::name).distinct()).hasSize(24);
         DemoTournaments.Tournament open = DemoTournaments.ALL.get(7);
         assertThat(open.rounds()).isEqualTo(4);
         assertThat(open.end()).isEqualTo(LocalDate.of(2026, 11, 1));
         assertThat(DemoTournaments.ALL).allSatisfy(tournament -> {
-            assertThat(tournament.end()).isBeforeOrEqualTo(DemoPopulation.COVER_UNTIL);
+            // Giải bắt đầu trong khoảng mô phỏng thì đá xong trong đó; giải năm sau chỉ cần mở đăng ký trong đó.
+            if (tournament.start().isAfter(DemoPopulation.COVER_UNTIL)) {
+                assertThat(tournament.registrationOpen()).as(tournament.name()).isBeforeOrEqualTo(DemoPopulation.COVER_UNTIL);
+            } else {
+                assertThat(tournament.end()).as(tournament.name()).isBeforeOrEqualTo(DemoPopulation.COVER_UNTIL);
+            }
             if (tournament.knockout()) {
                 assertThat(Integer.bitCount(tournament.teams())).as(tournament.name()).isEqualTo(1);
             } else {
